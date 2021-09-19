@@ -1,4 +1,5 @@
 ﻿using ExpensesAPI.Data;
+using ExpensesAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,27 @@ namespace ExpensesAPI.Controllers
 			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpPost]
+		public IHttpActionResult PostEntry([FromBody]Entry entry)
+		{
+			if (!ModelState.IsValid) return BadRequest(ModelState);
+
+			try
+			{
+				using (var context = new AppDbContext())
+				{
+					context.Entries.Add(entry);
+					context.SaveChangesAsync();
+
+					return Ok("Entry was created!");
+				}
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.Message);
 			}
 		}
     }

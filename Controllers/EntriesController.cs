@@ -1,10 +1,8 @@
 ﻿using ExpensesAPI.Data;
 using ExpensesAPI.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -30,7 +28,7 @@ namespace ExpensesAPI.Controllers
 		}
 
 		[HttpPost]
-		public IHttpActionResult PostEntry([FromBody]Entry entry)
+		public async Task<IHttpActionResult> PostEntry([FromBody]Entry entry)
 		{
 			if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -39,7 +37,7 @@ namespace ExpensesAPI.Controllers
 				using (var context = new AppDbContext())
 				{
 					context.Entries.Add(entry);
-					context.SaveChangesAsync();
+					await context.SaveChangesAsync();
 
 					return Ok("Entry was created!");
 				}

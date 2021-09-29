@@ -9,9 +9,9 @@ using System.Web.Http.Cors;
 namespace ExpensesAPI.Controllers
 {
 	[EnableCors("http://localhost:4200", "*", "*")]
-    public class EntriesController : ApiController
-    {
-        public IHttpActionResult GetEntries()
+	public class EntriesController : ApiController
+	{
+		 public IHttpActionResult GetEntries()
 		{
 			try
 			{
@@ -30,7 +30,8 @@ namespace ExpensesAPI.Controllers
 		[HttpPost]
 		public async Task<IHttpActionResult> PostEntry([FromBody]Entry entry)
 		{
-			if (!ModelState.IsValid) return BadRequest(ModelState);
+			if (!ModelState.IsValid) 
+				return BadRequest(ModelState);
 
 			try
 			{
@@ -47,5 +48,37 @@ namespace ExpensesAPI.Controllers
 				return BadRequest(e.Message);
 			}
 		}
-    }
+
+		[HttpPut]
+		public async Task<IHttpActionResult> UpdateEntry(int id, [FromBody]Entry entry)
+		{
+			if (!ModelState.IsValid) 
+				return BadRequest(ModelState);
+
+			if (id != entry.Id)
+				return BadRequest();
+
+			try
+			{
+				using (var context = new AppDbContext())
+				{
+					var oldEntry = context.Entries.FirstOrDefault(e => e.Id == id);
+					if (oldEntry == null)
+						return NotFound();
+
+					oldEntry.Description = entry.Description;
+					oldEntry.IsExpense = entry.IsExpense;
+					oldEntry.Value = entry.Value;
+
+					await context.SaveChangesAsync();
+
+					return Ok("Entry was updated");
+				}
+			}
+			catch (Exception e)
+			{
+				return BadRequest(e.Message);
+			}
+		}
+	}
 }
